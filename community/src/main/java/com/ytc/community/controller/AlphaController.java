@@ -1,14 +1,17 @@
 package com.ytc.community.controller;
 
 import com.ytc.community.service.AlphaService;
+import com.ytc.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -118,4 +121,39 @@ public class AlphaController {
         return list;
     }
 
+    @GetMapping("/cookie/set")
+    @ResponseBody
+    public String setCookie(HttpServletResponse response){
+        // new Cookie
+        // 每个 cookie 只能放一个键值对。
+        Cookie cookie = new Cookie("code", CommunityUtil.generateUUID());
+
+        // set cookie 生效范围
+        cookie.setPath("/alpha");
+        // set cookie age
+        cookie.setMaxAge(10*60);
+        // send Cookie
+        response.addCookie(cookie);
+        return "set cookie";
+    }
+    @GetMapping("/cookie/get")
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code){
+        System.out.println(code);
+        return "get Cookie";
+    }
+    @GetMapping("/session/set")
+    @ResponseBody
+    public String setSession(HttpSession session){
+        session.setAttribute("code", 1);
+        session.setAttribute("name", "ytc");
+        return "set Cookie";
+    }
+    @GetMapping("/session/get")
+    @ResponseBody
+    public String getSession(HttpSession session){
+        System.out.println(session.getAttribute("code"));
+        System.out.println(session.getAttribute("name"));
+        return "get Cookie";
+    }
 }

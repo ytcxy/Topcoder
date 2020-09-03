@@ -2,15 +2,24 @@ package com.ytc.community.util;
 
 public interface CommunityConstant {
     /**
-     * success
+     * 激活 success
      */
     int ACTIVATION_SUCCESS = 0;
     /**
-     * repeat
+     * repeat 激活
      */
     int ACTIVATION_REPEAT = 1;
     /**
-     * faild
+     * 激活 faild
      */
     int ACTIVATION_FAILURE = 2;
+    /**
+     * 默认状态下的登录凭证时间
+     */
+    int DEFAULT_EXPIRED_SECONDS = 3600 * 12;
+    /**
+     * 记住状态下的登录凭证时间
+     */
+    int REMEMBER_EXPIRED_SECONDS = 3600*24*10;
+
 }
