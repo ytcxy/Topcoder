@@ -18,14 +18,14 @@ public class AlphaService {
     }
 
     public AlphaService(){
-        System.out.println("Alpha Model");
+//        System.out.println("Alpha Model");
     }
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         System.out.println("init Alpha");
     }
 
-    @PreDestroy
+//    @PreDestroy
     public void destroy(){
         System.out.println("destroy Alpha");
     }

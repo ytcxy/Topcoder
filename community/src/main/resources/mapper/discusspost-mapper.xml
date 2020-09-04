@@ -5,6 +5,10 @@
     <sql id="selectField">
         id, user_id, title, content, type, status, create_time, comment_count, score
     </sql>
+    <sql id="insertField">
+        user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
     <select id="selectDiscussPosts" resultType="DiscussPost">
         select <include refid="selectField"></include>
         from discuss_post
@@ -15,6 +19,13 @@
         order by type desc , create_time desc
         limit #{offset}, #{limit}
     </select>
+
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        select <include refid="selectField"></include>
+        from discuss_post
+        where id = #{id}
+    </select>
+
     <select id="selectDiscussPostRows" resultType="int">
         select count(id)
         from discuss_post
@@ -23,5 +34,8 @@
             and user_id = #{userId}
         </if>
     </select>
-
+    <insert id="insertDiscussPost" parameterType="DiscussPost">
+        insert into discuss_post(<include refid="insertField"></include>)
+        values (#{userId}, #{title}, #{content}, #{type}, #{status}, #{createTime}, #{commentCount}, #{score})
+    </insert>
 </mapper>

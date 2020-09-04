@@ -76,7 +76,11 @@ public class MapperTest {
         loginTicketMapper.updateExpired(loginTicket.getTicket(), new Date(loginTicket.getExpired().getTime() + 3600 * 24 * 1000));
         loginTicket = loginTicketMapper.selectByUserID(155);
         System.out.println(loginTicket);
-
     }
 
+    @Test
+    public void testSelectDiscussPostById(){
+        DiscussPost post = discussPostMapper.selectDiscussPostById(109);
+        System.out.println(post);
+    }
 }

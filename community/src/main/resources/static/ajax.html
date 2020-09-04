@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax</title>
+</head>
+<body>
+    <p>
+        <input type="button" value="send" onclick="send();">
+    </p>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script>
+<!--     函数名字   -->
+        function send() {
+            $.post(
+                // 第一行 返回的地址
+                "/alpha/ajax",
+                // 第二行， 向服务器发送数据
+                {"name":"ytc", "age":22},
+                // 第三行，服务器返回的数据， 是个匿名函数。
+                function (data) {
+                    console.log(typeof (data));
+                    data = $.parseJSON(data); // data 原来是个string类型， 转成  json格式。
+                    console.log(data.code);
+                    console.log(data.msg);
+                }
+            );
+        }
+    </script>
+</body>
+</html>
