@@ -23,6 +23,10 @@ target/
 *.gz
 
 
+*.txt
+/community/src/main/resources/*.properties
+
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
