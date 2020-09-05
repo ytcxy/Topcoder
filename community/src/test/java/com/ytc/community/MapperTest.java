@@ -1,11 +1,9 @@
 package com.ytc.community;
 
-import com.ytc.community.dao.AlphaDao;
-import com.ytc.community.dao.DiscussPostMapper;
-import com.ytc.community.dao.LoginTicketMapper;
-import com.ytc.community.dao.UserMapper;
+import com.ytc.community.dao.*;
 import com.ytc.community.entity.DiscussPost;
 import com.ytc.community.entity.LoginTicket;
+import com.ytc.community.entity.Message;
 import com.ytc.community.entity.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +21,8 @@ import java.util.List;
 public class MapperTest {
     @Autowired
     UserMapper userMapper;
-
+    @Autowired
+    private MessageMapper messageMapper;
     @Autowired
     DiscussPostMapper discussPostMapper;
 
@@ -82,5 +81,22 @@ public class MapperTest {
     public void testSelectDiscussPostById(){
         DiscussPost post = discussPostMapper.selectDiscussPostById(109);
         System.out.println(post);
+    }
+
+    @Test
+    public void testMessage(){
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+//        for (Message message: list)
+//            System.out.println(message.toString());
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+        list = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message:list)
+            System.out.println(message.toString());
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
+
     }
 }

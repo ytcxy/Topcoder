@@ -134,12 +134,13 @@ public class UserService implements CommunityConstant {
             map.put("passwordMsg", "密码错误");
             return map;
         }
-
+        System.out.println(user.toString());
         // 生成登录的凭证。
         LoginTicket loginTicket = new LoginTicket();
         loginTicket = loginTicketMapper.selectByUserID(user.getId());
 
         if (loginTicket == null){
+            loginTicket = new LoginTicket();
             loginTicket.setUserId(user.getId());
             loginTicket.setTicket(CommunityUtil.generateUUID());
             loginTicket.setStatus(0);
@@ -186,5 +187,9 @@ public class UserService implements CommunityConstant {
         newPassword = CommunityUtil.md5(newPassword+user.getSalt());
         userMapper.updatePassword(user.getId(), newPassword);
         return map;
+    }
+
+    public User findUserByName(String name){
+        return userMapper.selectByName(name);
     }
 }
