@@ -2,7 +2,10 @@ package com.ytc.community.controller;
 import com.ytc.community.annotation.LoginRequired;
 import com.ytc.community.dao.LoginTicketMapper;
 import com.ytc.community.entity.User;
+import com.ytc.community.service.FollowService;
+import com.ytc.community.service.LikeService;
 import com.ytc.community.service.UserService;
+import com.ytc.community.util.CommunityConstant;
 import com.ytc.community.util.CommunityUtil;
 import com.ytc.community.util.CookieUtil;
 import com.ytc.community.util.HostHolder;
@@ -29,7 +32,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements CommunityConstant {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Value("${community.path.domain}")
@@ -39,14 +42,18 @@ public class UserController {
     private String uploadPath;
 
     @Autowired
+    private LikeService likeService;
+    @Autowired
     private HostHolder hostHolder;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private LoginTicketMapper loginTicketMapper;
+//    @Autowired
+//    private LoginTicketMapper loginTicketMapper;
 
+    @Autowired
+    private FollowService followService;
     @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage(){
@@ -121,7 +128,8 @@ public class UserController {
         if (map.isEmpty()){
             // 成功则跳转到登录页面， 然后重新登录
             String ticket = CookieUtil.getValue(request, "ticket");
-            loginTicketMapper.updateStatus(ticket, 1);
+            userService.logout(ticket);
+//            loginTicketMapper.updateStatus(ticket, 1);
             return "redirect:/login";
         } else {
             // 失败跳转回原页面。
@@ -131,4 +139,33 @@ public class UserController {
         }
     }
 
+    
+    @GetMapping("/profile/{userId}")
+    public String getProfilePage(@PathVariable("userId") int userId, Model model){
+        User user = userService.findById(userId);
+        if (user == null){
+            throw new RuntimeException("该用户不存在");
+        }
+        // user
+        model.addAttribute("user", user);
+        // likeCount
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+        // followee count
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount);
+
+        // follower count
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+        // follow or not
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null){
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
+
+        return "/site/profile";
+    }
 }

@@ -5,6 +5,8 @@ import com.ytc.community.dao.UserMapper;
 import com.ytc.community.entity.DiscussPost;
 import com.ytc.community.entity.Page;
 import com.ytc.community.entity.User;
+import com.ytc.community.service.LikeService;
+import com.ytc.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,12 +19,15 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class HomeController {
+public class HomeController implements CommunityConstant {
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    DiscussPostMapper discussPostMapper;
+    private DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    private LikeService likeService;
 
     @GetMapping("/index")
     public String index(Model model, Page page){
@@ -36,14 +41,20 @@ public class HomeController {
             for (DiscussPost post : lists){
                 Map<String, Object> map = new HashMap<>();
                 User user = userMapper.selectById(post.getUserId());
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
+
+                map.put("likeCount", likeCount);
                 map.put("post", post);
                 map.put("user", user);
-                System.out.println(post);
-                System.out.println(user);
                 discussPosts.add(map);
             }
          }
         model.addAttribute("discussPosts", discussPosts);
         return "/index";
+    }
+    @GetMapping("/error")
+    public String errorPage(){
+
+        return "/error/500";
     }
 }
