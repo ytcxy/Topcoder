@@ -23,6 +23,11 @@
         limit #{offset}, #{limit}
     </select>
 
+    <select id="selectCommentById" resultType="Comment">
+        select <include refid="selectField"></include>
+        from comment
+        where id = #{id}
+    </select>
 
 
     <select id="selectCountByEntity" resultType="int">

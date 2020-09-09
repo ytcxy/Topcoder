@@ -22,6 +22,8 @@ target/
 *.log
 *.gz
 
+/data
+
 /community/src/main/resources/*.properties
 community/src/main/resources/application.properties
 

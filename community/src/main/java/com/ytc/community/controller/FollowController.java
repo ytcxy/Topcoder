@@ -1,8 +1,10 @@
 package com.ytc.community.controller;
 
 import com.ytc.community.annotation.LoginRequired;
+import com.ytc.community.entity.Event;
 import com.ytc.community.entity.Page;
 import com.ytc.community.entity.User;
+import com.ytc.community.event.EventProducer;
 import com.ytc.community.service.FollowService;
 import com.ytc.community.service.UserService;
 import com.ytc.community.util.CommunityConstant;
@@ -25,6 +27,9 @@ public class FollowController implements CommunityConstant {
     private FollowService followService;
 
     @Autowired
+    private EventProducer eventProducer;
+
+    @Autowired
     private HostHolder hostHolder;
 
     @Autowired
@@ -35,6 +40,16 @@ public class FollowController implements CommunityConstant {
     public String follow(int entityType, int entityId){
         User user = hostHolder.getUser();
         followService.follow(user.getId(), entityType, entityId);
+        // 触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+
+        eventProducer.fireEvent(event);
+
         return CommunityUtil.getJSONString(0, "已关注");
     }
     @PostMapping("/unfollow")
