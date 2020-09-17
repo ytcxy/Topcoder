@@ -1,9 +1,7 @@
 package com.ytc.community.controller;
 
-import com.ytc.community.entity.Comment;
-import com.ytc.community.entity.DiscussPost;
-import com.ytc.community.entity.Page;
-import com.ytc.community.entity.User;
+import com.ytc.community.entity.*;
+import com.ytc.community.event.EventProducer;
 import com.ytc.community.service.CommentService;
 import com.ytc.community.service.DiscussPostService;
 import com.ytc.community.service.LikeService;
@@ -37,6 +35,10 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
+
     @PostMapping("/add")
     @ResponseBody
     public String addDiscussPost(String title, String content){
@@ -50,6 +52,15 @@ public class DiscussPostController implements CommunityConstant {
         post.setContent(content);
         post.setCreateTime(new Date());
         discussPostService.addDiscussPost(post);
+
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(post.getId());
+        eventProducer.fireEvent(event);
+
 
         // 报错的情况下，以后统一处理。
         return CommunityUtil.getJSONString(0, "发布成功");
@@ -126,5 +137,48 @@ public class DiscussPostController implements CommunityConstant {
         model.addAttribute("comments", commentVoList);
 
         return "/site/discuss-detail";
+    }
+
+    // 置顶
+    @PostMapping("/top")
+    @ResponseBody
+    public String setTop(int id){
+        discussPostService.updateType(id, 1);
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
+    }
+    // 加精
+    @PostMapping("/wonderful")
+    @ResponseBody
+    public String setWonderful(int id){
+        discussPostService.updateStatus(id, 1);
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
+    }
+    // 加精
+    @PostMapping("/delete")
+    @ResponseBody
+    public String setDelete(int id){
+        discussPostService.updateStatus(id, 2);
+        // 触发删帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_DELETE)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
     }
 }
